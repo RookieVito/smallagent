@@ -1,3 +1,7 @@
 .python/
 __pycache__/
-模仿/
+模版/
+.venv/
+阶段/
+node_modules/
+frontend/dist/
