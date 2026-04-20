@@ -113,9 +113,12 @@ describe('ResultView', () => {
     expect(wrapper.text()).toContain('预估费用')
   })
 
-  it('renders map placeholder', () => {
+  it('renders map error state when AMap key is not configured', async () => {
     const wrapper = mountResult()
-    expect(wrapper.text()).toContain('地图加载中')
+    // initMap is async (onMounted), wait for it to complete
+    await vi.waitFor(() => {
+      expect(wrapper.text()).toContain('地图不可用')
+    })
   })
 
   it('renders date range and day count in subtitle', () => {
