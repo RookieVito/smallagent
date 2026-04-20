@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { usePlanStore } from '@/composables/usePlanStore'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -14,6 +15,13 @@ const router = createRouter({
       component: () => import('@/views/ResultView.vue'),
     },
   ],
+})
+
+router.beforeEach((to) => {
+  if (to.name === 'result') {
+    const { currentPlan } = usePlanStore()
+    if (!currentPlan.value) return { name: 'planning' }
+  }
 })
 
 export default router
