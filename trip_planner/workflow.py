@@ -28,6 +28,7 @@ from trip_planner.models.state import PlannerState
 # 每个字段是一个可替换的函数，测试时注入 mock，生产时替换为真实调用。
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class Services:
     fetch_attractions: Callable[[TripPlanRequest], list[dict]] = field(
@@ -44,6 +45,7 @@ class Services:
 # ---------------------------------------------------------------------------
 # 默认 stub 实现
 # ---------------------------------------------------------------------------
+
 
 def _default_fetch_attractions(req: TripPlanRequest) -> list[dict]:
     dest = req.destination
@@ -62,6 +64,38 @@ def _default_fetch_attractions(req: TripPlanRequest) -> list[dict]:
             "latitude": 35.01,
             "longitude": 135.01,
             "suggested_duration_minutes": 60,
+            "ticket_price": None,
+        },
+        {
+            "name": f"{dest}古寺",
+            "address": f"{dest}古寺路3号",
+            "latitude": 35.02,
+            "longitude": 134.99,
+            "suggested_duration_minutes": 80,
+            "ticket_price": "30.00",
+        },
+        {
+            "name": f"{dest}市场街",
+            "address": f"{dest}市场街4号",
+            "latitude": 34.99,
+            "longitude": 135.02,
+            "suggested_duration_minutes": 120,
+            "ticket_price": None,
+        },
+        {
+            "name": f"{dest}地标塔",
+            "address": f"{dest}地标广场5号",
+            "latitude": 35.03,
+            "longitude": 135.03,
+            "suggested_duration_minutes": 60,
+            "ticket_price": "80.00",
+        },
+        {
+            "name": f"{dest}花园",
+            "address": f"{dest}花园路6号",
+            "latitude": 34.98,
+            "longitude": 134.98,
+            "suggested_duration_minutes": 90,
             "ticket_price": None,
         },
     ]
@@ -97,6 +131,7 @@ def _default_fetch_hotels(req: TripPlanRequest) -> list[dict]:
 # 节点函数 — 从 config["configurable"]["services"] 读取服务层
 # ---------------------------------------------------------------------------
 
+
 def _get_services(config: RunnableConfig) -> Services:
     return config.get("configurable", {}).get("services", Services())
 
@@ -116,29 +151,38 @@ def normalize_request(state: PlannerState) -> dict:
 
 
 def fetch_attractions(state: PlannerState, config: RunnableConfig) -> dict:
-    """检索目的地候选景点，写入 candidate_attractions。"""
+    """检索目的地候选景点（主链路依赖）。"""
     if state.request is None:
         return {"errors": ["fetch_attractions: request 缺失，跳过"]}
     svc = _get_services(config)
-    result = svc.fetch_attractions(state.request)
+    try:
+        result = svc.fetch_attractions(state.request)
+    except Exception as exc:
+        return {"errors": [f"fetch_attractions: {exc}"], "candidate_attractions": []}
     return {"candidate_attractions": result}
 
 
 def fetch_weather(state: PlannerState, config: RunnableConfig) -> dict:
-    """查询旅行期天气，写入 weather_data。"""
+    """查询旅行期天气（主链路依赖）。"""
     if state.request is None:
         return {"errors": ["fetch_weather: request 缺失，跳过"]}
     svc = _get_services(config)
-    result = svc.fetch_weather(state.request)
+    try:
+        result = svc.fetch_weather(state.request)
+    except Exception as exc:
+        return {"errors": [f"fetch_weather: {exc}"], "weather_data": {}}
     return {"weather_data": result}
 
 
 def fetch_hotels(state: PlannerState, config: RunnableConfig) -> dict:
-    """检索住宿候选，写入 hotel_candidates。"""
+    """检索住宿候选（可降级依赖：失败时写入空列表而非阻断主链路）。"""
     if state.request is None:
         return {"errors": ["fetch_hotels: request 缺失，跳过"]}
     svc = _get_services(config)
-    result = svc.fetch_hotels(state.request)
+    try:
+        result = svc.fetch_hotels(state.request)
+    except Exception:
+        return {"hotel_candidates": []}
     return {"hotel_candidates": result}
 
 
@@ -153,7 +197,8 @@ def assemble_plan(state: PlannerState) -> dict:
         return {"errors": [f"assemble_plan: 主链路素材缺失 — {', '.join(missing)}"]}
 
     req = state.request
-    assert req is not None
+    if req is None:
+        return {"errors": ["assemble_plan: request 缺失"]}
 
     trip_days = req.trip_days
     attractions_per_day = max(1, len(state.candidate_attractions) // trip_days)
@@ -161,7 +206,9 @@ def assemble_plan(state: PlannerState) -> dict:
     for i in range(trip_days):
         day_date = date.fromordinal(req.start_date.toordinal() + i)
         slice_start = i * attractions_per_day
-        raw_attrs = state.candidate_attractions[slice_start : slice_start + attractions_per_day]
+        raw_attrs = state.candidate_attractions[
+            slice_start : slice_start + attractions_per_day
+        ]
         if not raw_attrs:
             raw_attrs = state.candidate_attractions[:1]
         attractions = [
@@ -171,7 +218,9 @@ def assemble_plan(state: PlannerState) -> dict:
                 latitude=float(a["latitude"]),
                 longitude=float(a["longitude"]),
                 suggested_duration_minutes=int(a["suggested_duration_minutes"]),
-                ticket_price=Decimal(a["ticket_price"]) if a.get("ticket_price") else None,
+                ticket_price=Decimal(a["ticket_price"])
+                if a.get("ticket_price")
+                else None,
             )
             for a in raw_attrs
         ]
@@ -235,6 +284,7 @@ def assemble_plan(state: PlannerState) -> dict:
 # 图构建
 # ---------------------------------------------------------------------------
 
+
 def _build_graph() -> StateGraph:
     g = StateGraph(state_schema=PlannerState)
 
@@ -265,6 +315,7 @@ _app = _build_graph().compile()
 # 公开入口
 # ---------------------------------------------------------------------------
 
+
 def run_planner(request: TripPlanRequest, services: Services | None = None) -> TripPlan:
     """执行规划工作流，返回 TripPlan；主链路失败时抛出 RuntimeError。"""
     config: RunnableConfig = {}
@@ -275,7 +326,9 @@ def run_planner(request: TripPlanRequest, services: Services | None = None) -> T
     final_state = PlannerState.model_validate(result)
 
     if final_state.trip_plan is None:
-        error_detail = "; ".join(final_state.errors) if final_state.errors else "未知错误"
+        error_detail = (
+            "; ".join(final_state.errors) if final_state.errors else "未知错误"
+        )
         raise RuntimeError(f"规划失败: {error_detail}")
 
     return final_state.trip_plan
