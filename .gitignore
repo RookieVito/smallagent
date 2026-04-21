@@ -5,3 +5,4 @@ __pycache__/
 阶段/
 node_modules/
 frontend/dist/
+frontend/tsconfig.tsbuildinfo

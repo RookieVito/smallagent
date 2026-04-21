@@ -29,8 +29,8 @@
 
 本索引页只负责“从用户请求到结构化规划结果”的阅读路径，不展开前端展示、外部服务降级或阶段验收细节。
 
-1. [trip-request-and-plan-contract.md](../../设计文档/V0/trip-request-and-plan-contract.md)：`未开始`
-2. [planner-workflow-and-state-contract.md](../../设计文档/V0/planner-workflow-and-state-contract.md)：`未开始`
+1. [trip-request-and-plan-contract.md](../../设计文档/V0/trip-request-and-plan-contract.md)：`Not Implemented in Code`
+2. [planner-workflow-and-state-contract.md](../../设计文档/V0/planner-workflow-and-state-contract.md)：`Not Implemented in Code`
 ```
 
 - [ ] **Step 2: Write `阶段/设计文档/V0/trip-request-and-plan-contract.md`**
@@ -123,9 +123,9 @@ git commit -m "docs: add V0 planning path contracts"
 
 本索引页只负责“如何把规划结果变成用户可用闭环”的阅读路径，不重复展开规划工作流或请求输出字段的正文。
 
-1. [frontend-experience-and-editing-contract.md](../../设计文档/V0/frontend-experience-and-editing-contract.md)：`未开始`
-2. [external-service-boundary.md](../../设计文档/V0/external-service-boundary.md)：`未开始`
-3. [v0-acceptance-and-non-goals.md](../../设计文档/V0/v0-acceptance-and-non-goals.md)：`未开始`
+1. [frontend-experience-and-editing-contract.md](../../设计文档/V0/frontend-experience-and-editing-contract.md)：`Not Implemented in Code`
+2. [external-service-boundary.md](../../设计文档/V0/external-service-boundary.md)：`Not Implemented in Code`
+3. [v0-acceptance-and-non-goals.md](../../设计文档/V0/v0-acceptance-and-non-goals.md)：`Not Implemented in Code`
 ```
 
 - [ ] **Step 2: Write `阶段/设计文档/V0/frontend-experience-and-editing-contract.md`**

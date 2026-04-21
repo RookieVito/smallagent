@@ -8,6 +8,7 @@ const props = defineProps<{ mapPoints: MapPoint[] }>()
 const containerRef = ref<HTMLDivElement>()
 const mapInstance = ref<any>(null)
 const markers = ref<any[]>([])
+const AMapRef = ref<any>(null)
 const loadError = ref(false)
 
 async function initMap() {
@@ -27,6 +28,7 @@ async function initMap() {
       zoom: 12,
       resizeEnable: true,
     })
+    AMapRef.value = AMap
 
     addMarkers(AMap)
   } catch {
@@ -64,11 +66,8 @@ function clearMarkers() {
 watch(
   () => props.mapPoints,
   () => {
-    if (mapInstance.value) {
-      const key = import.meta.env.VITE_AMAP_KEY
-      if (key) {
-        AMapLoader.load({ key, version: '2.0' }).then(addMarkers)
-      }
+    if (mapInstance.value && AMapRef.value) {
+      addMarkers(AMapRef.value)
     }
   },
   { deep: true },

@@ -19,6 +19,18 @@ const dateRange = computed(() => {
 
 const dayCount = computed(() => plan.value?.days.length ?? 0)
 
+const visibleMapPoints = computed(() => {
+  if (!plan.value) return []
+  return plan.value.days.flatMap(day =>
+    day.attractions.map(a => ({
+      name: a.name,
+      latitude: a.latitude,
+      longitude: a.longitude,
+      category: 'attraction',
+    })),
+  )
+})
+
 function goBack() {
   router.push({ name: 'planning' })
 }
@@ -97,7 +109,7 @@ async function moveAttraction(dayIndex: number, attractionIndex: number, directi
 
       <a-col :span="10">
         <a-card title="地图" style="margin-bottom: 16px">
-          <MapContainer :map-points="plan.map_points" />
+          <MapContainer :map-points="visibleMapPoints" />
         </a-card>
 
         <a-card title="预算摘要" style="margin-bottom: 16px">
