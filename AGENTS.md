@@ -3,8 +3,7 @@
 - Debian
 - 仓库根 Python 命令使用本地 `.venv`
 
-# 当前阶段入口
-- [阶段/索引页/V0/1_规划闭环与数据契约.md](阶段/索引页/V0/1_规划闭环与数据契约.md)# cx — Semantic Code Navigation
+# cx — Semantic Code Navigation
 
 Prefer cx over reading files. Escalate: overview → symbols → definition/references → Read tool.
 

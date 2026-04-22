@@ -19,6 +19,7 @@ from trip_planner.workflow import Services
 @pytest.fixture(scope="module")
 def client():
     from trip_planner.api import app
+
     return TestClient(app, raise_server_exceptions=False)
 
 
@@ -46,6 +47,7 @@ from datetime import date
 
 def _req(**overrides) -> TripPlanRequest:
     from trip_planner.models.enums import BudgetLevel, AccommodationType
+
     base = dict(
         destination="京都",
         start_date=date(2025, 5, 1),
@@ -105,25 +107,38 @@ class TestDegradableFailureViaServices:
 # HTTP 层：主链路失败 → 503
 # ---------------------------------------------------------------------------
 
+
 class TestMainChainFailureViaAPI:
     def test_attractions_failure_returns_503(self, client: TestClient):
         """景点检索失败（主链路）→ 503，不返回伪造的 TripPlan。"""
         from unittest.mock import patch
-        with patch("trip_planner.api.run_planner", side_effect=RuntimeError("规划失败: 景点服务不可用")):
+
+        with patch(
+            "trip_planner.api.run_planner",
+            side_effect=RuntimeError("规划失败: 景点服务不可用"),
+        ):
             resp = client.post("/api/trip/plan", json=_valid_payload())
         assert resp.status_code == 503
 
     def test_503_body_contains_detail(self, client: TestClient):
         """503 响应体必须包含 detail 字段。"""
         from unittest.mock import patch
-        with patch("trip_planner.api.run_planner", side_effect=RuntimeError("规划失败: 景点服务不可用")):
+
+        with patch(
+            "trip_planner.api.run_planner",
+            side_effect=RuntimeError("规划失败: 景点服务不可用"),
+        ):
             resp = client.post("/api/trip/plan", json=_valid_payload())
         assert "detail" in resp.json()
 
     def test_503_does_not_return_trip_plan_fields(self, client: TestClient):
         """503 响应体不包含 days 或 trip_plan 字段。"""
         from unittest.mock import patch
-        with patch("trip_planner.api.run_planner", side_effect=RuntimeError("规划失败: 景点服务不可用")):
+
+        with patch(
+            "trip_planner.api.run_planner",
+            side_effect=RuntimeError("规划失败: 景点服务不可用"),
+        ):
             resp = client.post("/api/trip/plan", json=_valid_payload())
         body = resp.json()
         assert "days" not in body
@@ -134,20 +149,87 @@ class TestMainChainFailureViaAPI:
 # 服务边界：响应只包含契约定义的字段
 # ---------------------------------------------------------------------------
 
+
 class TestServiceFieldBoundary:
     def test_response_contains_only_defined_top_level_fields(self, client: TestClient):
         """响应体只包含 TripPlan 契约中定义的顶层字段。"""
         resp = client.post("/api/trip/plan", json=_valid_payload())
-        allowed = {"destination", "days", "weather_summary", "budget_summary", "map_points"}
+        allowed = {
+            "destination",
+            "days",
+            "weather_summary",
+            "budget_summary",
+            "map_points",
+        }
         extra = set(resp.json().keys()) - allowed
         assert extra == set(), f"响应包含未定义字段: {extra}"
 
     def test_attraction_contains_only_defined_fields(self, client: TestClient):
         """景点对象只包含 Attraction 契约中定义的字段。"""
         resp = client.post("/api/trip/plan", json=_valid_payload())
-        allowed = {"name", "address", "latitude", "longitude",
-                   "suggested_duration_minutes", "ticket_price"}
+        allowed = {
+            "name",
+            "address",
+            "latitude",
+            "longitude",
+            "suggested_duration_minutes",
+            "ticket_price",
+        }
         for day in resp.json()["days"]:
             for attr in day["attractions"]:
                 extra = set(attr.keys()) - allowed
                 assert extra == set(), f"景点包含未定义字段: {extra}"
+
+
+# ---------------------------------------------------------------------------
+# 主链路服务抛异常（非返回空值）→ run_planner 抛出 RuntimeError
+# ---------------------------------------------------------------------------
+
+
+def _raising(exc: Exception):
+    """Helper that returns a callable which raises *exc* when called."""
+
+    def _fn(_req):
+        raise exc
+
+    return _fn
+
+
+class TestMainChainExceptionViaServices:
+    def test_attractions_exception_raises_runtime_error(self):
+        """景点服务抛异常 → run_planner 抛出 RuntimeError。"""
+        svc = Services(fetch_attractions=_raising(ConnectionError("连接失败")))
+        with pytest.raises(RuntimeError, match="规划失败"):
+            run_planner(_req(), services=svc)
+
+    def test_weather_exception_raises_runtime_error(self):
+        """天气服务抛异常 → run_planner 抛出 RuntimeError。"""
+        svc = Services(fetch_weather=_raising(ConnectionError("连接失败")))
+        with pytest.raises(RuntimeError, match="规划失败"):
+            run_planner(_req(), services=svc)
+
+    def test_error_message_contains_exception_detail(self):
+        """RuntimeError 消息中包含原始异常信息。"""
+        svc = Services(fetch_attractions=_raising(ConnectionError("景点 API 超时")))
+        with pytest.raises(RuntimeError) as exc_info:
+            run_planner(_req(), services=svc)
+        assert "景点 API 超时" in str(exc_info.value)
+
+
+# ---------------------------------------------------------------------------
+# 可降级服务抛异常 → 仍然产出 TripPlan（降级）
+# ---------------------------------------------------------------------------
+
+
+class TestDegradableExceptionViaServices:
+    def test_hotels_exception_still_returns_plan(self):
+        """酒店服务抛异常 → 仍然产出 TripPlan（降级）。"""
+        svc = Services(fetch_hotels=_raising(ConnectionError("酒店 API 不可用")))
+        plan = run_planner(_req(), services=svc)
+        assert isinstance(plan, TripPlan)
+
+    def test_hotels_exception_accommodation_note_degraded(self):
+        """酒店服务异常时 accommodation_note 包含降级说明。"""
+        svc = Services(fetch_hotels=_raising(ConnectionError("酒店 API 不可用")))
+        plan = run_planner(_req(), services=svc)
+        assert "京都" in plan.days[0].accommodation_note
