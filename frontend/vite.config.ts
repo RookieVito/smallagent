@@ -2,6 +2,8 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
+const apiProxyTarget = process.env.TRIP_PLANNER_API_ORIGIN || 'http://localhost:8010'
+
 export default defineConfig({
   plugins: [vue()],
   resolve: {
@@ -11,7 +13,7 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': 'http://localhost:8000',
+      '/api': apiProxyTarget,
     },
   },
   test: {
