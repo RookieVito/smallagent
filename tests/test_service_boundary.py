@@ -121,7 +121,10 @@ class TestMainChainFailureViaAPI:
             side_effect=RuntimeError("规划失败: 景点服务不可用"),
         ):
             resp = client.post("/api/trip/plan", json=_valid_payload())
-        assert "detail" in resp.json()
+        body = resp.json()
+        # 结构化错误响应包含 error_code 和 message
+        assert body.get("error_code") == "PLAN_FAILED"
+        assert "message" in body
 
     def test_503_does_not_return_trip_plan_fields(self, client: TestClient):
         from unittest.mock import patch
