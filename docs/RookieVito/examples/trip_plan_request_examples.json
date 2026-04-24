@@ -1,0 +1,26 @@
+[
+  {
+    "destination": "京都",
+    "start_date": "2025-10-15",
+    "end_date": "2025-10-18",
+    "preferences": [
+      "历史文化",
+      "美食",
+      "自然风光"
+    ],
+    "budget_level": "moderate",
+    "accommodation_type": "hotel"
+  },
+  {
+    "destination": "东京",
+    "start_date": "2025-11-01",
+    "end_date": "2025-11-06",
+    "preferences": [
+      "购物",
+      "动漫",
+      "美食"
+    ],
+    "budget_level": "luxury",
+    "accommodation_type": "resort"
+  }
+]
