@@ -4,7 +4,15 @@ from decimal import Decimal
 import pytest
 
 from trip_planner.models.enums import AccommodationType, BudgetLevel
-from trip_planner.models.plan import TripPlan
+from trip_planner.models.plan import (
+    Attraction,
+    BudgetBreakdown,
+    BudgetSummary,
+    DailyForecast,
+    DayPlan,
+    TripPlan,
+    WeatherSummary,
+)
 from trip_planner.models.request import TripPlanRequest
 from trip_planner.models.state import PlannerState
 from trip_planner.workflow import (
@@ -79,6 +87,17 @@ def test_fetch_weather_has_overview(base_state: PlannerState):
     assert result["weather_data"]["overview"]
 
 
+def test_fetch_weather_has_daily_forecasts(base_state: PlannerState):
+    result = fetch_weather(base_state, _EMPTY_CONFIG)
+    forecasts = result["weather_data"]["daily_forecasts"]
+    assert len(forecasts) > 0
+    for f in forecasts:
+        assert "date" in f
+        assert "condition" in f
+        assert "high_celsius" in f
+        assert "low_celsius" in f
+
+
 def test_fetch_weather_no_request():
     assert fetch_weather(PlannerState(), _EMPTY_CONFIG)["errors"]
 
@@ -124,7 +143,13 @@ def _full_state(request: TripPlanRequest) -> PlannerState:
                 "ticket_price": None,
             },
         ],
-        weather_data={"overview": "晴天为主", "daily_forecasts": []},
+        weather_data={
+            "overview": "晴天为主",
+            "daily_forecasts": [
+                {"date": "2025-05-01", "condition": "晴", "high_celsius": 24, "low_celsius": 16},
+                {"date": "2025-05-02", "condition": "多云", "high_celsius": 22, "low_celsius": 14},
+            ],
+        },
         hotel_candidates=[
             {"name": "京都精选酒店", "address": "四条", "price_per_night": "800", "type": "hotel"}
         ],
@@ -149,6 +174,24 @@ def test_assemble_plan_map_points(kyoto_request: TripPlanRequest):
 def test_assemble_plan_budget_currency(kyoto_request: TripPlanRequest):
     result = assemble_plan(_full_state(kyoto_request))
     assert result["trip_plan"].budget_summary.currency == "CNY"
+
+
+def test_assemble_plan_budget_breakdown_strong_type(kyoto_request: TripPlanRequest):
+    result = assemble_plan(_full_state(kyoto_request))
+    bb = result["trip_plan"].budget_summary.breakdown
+    assert isinstance(bb, BudgetBreakdown)
+    assert bb.accommodation > Decimal("0")
+    assert bb.dining > Decimal("0")
+    assert bb.attractions > Decimal("0")
+    assert bb.transport > Decimal("0")
+
+
+def test_assemble_plan_weather_daily_forecasts_strong_type(kyoto_request: TripPlanRequest):
+    result = assemble_plan(_full_state(kyoto_request))
+    forecasts = result["trip_plan"].weather_summary.daily_forecasts
+    assert len(forecasts) == 2
+    assert all(isinstance(f, DailyForecast) for f in forecasts)
+    assert forecasts[0].condition == "晴"
 
 
 def test_assemble_plan_fails_without_attractions(kyoto_request: TripPlanRequest):
@@ -202,8 +245,20 @@ def test_run_planner_weather_summary(kyoto_request: TripPlanRequest):
     assert run_planner(kyoto_request).weather_summary.overview != ""
 
 
+def test_run_planner_weather_forecasts_populated(kyoto_request: TripPlanRequest):
+    plan = run_planner(kyoto_request)
+    assert len(plan.weather_summary.daily_forecasts) == kyoto_request.trip_days
+
+
 def test_run_planner_budget_positive(kyoto_request: TripPlanRequest):
     assert run_planner(kyoto_request).budget_summary.estimated_total > Decimal("0")
+
+
+def test_run_planner_budget_breakdown_sums_correctly(kyoto_request: TripPlanRequest):
+    plan = run_planner(kyoto_request)
+    bb = plan.budget_summary.breakdown
+    total = bb.accommodation + bb.dining + bb.attractions + bb.transport
+    assert total == plan.budget_summary.estimated_total
 
 
 def test_run_planner_map_points(kyoto_request: TripPlanRequest):
@@ -228,3 +283,4 @@ def test_run_planner_json_roundtrip(kyoto_request: TripPlanRequest):
     restored = TripPlan.model_validate_json(plan.model_dump_json())
     assert restored.destination == plan.destination
     assert len(restored.days) == len(plan.days)
+    assert isinstance(restored.budget_summary.breakdown, BudgetBreakdown)
