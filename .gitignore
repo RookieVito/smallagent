@@ -8,4 +8,4 @@ frontend/dist/
 frontend/tsconfig.tsbuildinfo
 AGENTS.md/
 .codex
-docs/
+# docs/ is tracked — do NOT ignore it
