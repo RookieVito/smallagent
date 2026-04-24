@@ -1,14 +1,23 @@
-from typing import Literal
+from datetime import datetime, timezone
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, model_validator
+from pydantic import ValidationError
 
+from trip_planner.config import get_settings
+from trip_planner.models.edit import EditRequest
 from trip_planner.models.plan import TripPlan
 from trip_planner.models.request import TripPlanRequest
-from trip_planner.workflow import Services, run_planner
+from trip_planner.workflow import run_planner
 
-app = FastAPI(title="智能旅行助手 API", version="0.1.0")
+_settings = get_settings()
+
+app = FastAPI(
+    title=_settings.app_title,
+    version=_settings.app_version,
+    description=_settings.app_description,
+)
 
 
 @app.get("/health")
@@ -19,43 +28,71 @@ def health():
 @app.post("/api/trip/plan", response_model=TripPlan)
 def create_trip_plan(request: TripPlanRequest) -> JSONResponse | TripPlan:
     try:
-        return run_planner(request)
+        plan = run_planner(request)
+        # 由服务端生成 created_at
+        plan_dict = plan.model_dump()
+        plan_dict["created_at"] = datetime.now(timezone.utc).isoformat()
+        plan_dict["plan_version"] = _settings.default_plan_version
+        return TripPlan.model_validate(plan_dict)
     except RuntimeError as exc:
         return JSONResponse(status_code=503, content={"detail": str(exc)})
+
+
+# ---------------------------------------------------------------------------
+# 统一验证错误处理器
+# ---------------------------------------------------------------------------
+
+
+def _safe_validation_errors(errors: list[dict]) -> list[dict]:
+    """递归清理验证错误，确保所有值可 JSON 序列化。"""
+    cleaned = []
+    for err in errors:
+        item = {}
+        for k, v in err.items():
+            if isinstance(v, Exception):
+                item[k] = str(v)
+            elif isinstance(v, dict):
+                item[k] = _safe_validation_errors([v])[0] if v else {}
+            else:
+                item[k] = v
+        cleaned.append(item)
+    return cleaned
+
+
+@app.exception_handler(RequestValidationError)
+async def request_validation_exception_handler(_request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=422,
+        content={
+            "error_code": "VALIDATION_ERROR",
+            "message": "请求参数验证失败",
+            "details": _safe_validation_errors(exc.errors()),
+        },
+    )
+
+
+@app.exception_handler(ValidationError)
+async def validation_exception_handler(_request: Request, exc: ValidationError):
+    return JSONResponse(
+        status_code=422,
+        content={
+            "error_code": "VALIDATION_ERROR",
+            "message": "请求参数验证失败",
+            "details": _safe_validation_errors(exc.errors()),
+        },
+    )
 
 
 # ---------------------------------------------------------------------------
 # 编辑端点
 # ---------------------------------------------------------------------------
 
-class EditRequest(BaseModel):
-    plan: TripPlan
-    operation: Literal["delete_attraction", "move_attraction"]
-    day_index: int
-    attraction_index: int
-    direction: Literal["up", "down"] | None = None
-
-    @model_validator(mode="after")
-    def validate_bounds_and_direction(self) -> "EditRequest":
-        days = self.plan.days
-        if self.day_index < 0 or self.day_index >= len(days):
-            raise ValueError(
-                f"day_index {self.day_index} 越界（共 {len(days)} 天）"
-            )
-        attractions = days[self.day_index].attractions
-        if self.attraction_index < 0 or self.attraction_index >= len(attractions):
-            raise ValueError(
-                f"attraction_index {self.attraction_index} 越界（第 {self.day_index} 天共 {len(attractions)} 个景点）"
-            )
-        if self.operation == "move_attraction" and self.direction is None:
-            raise ValueError("move_attraction 操作必须提供 direction")
-        return self
-
 
 @app.post("/api/trip/edit", response_model=TripPlan)
 def edit_trip_plan(req: EditRequest) -> TripPlan:
-    # 深拷贝，不修改原始对象
     plan = req.plan.model_copy(deep=True)
+    # 编辑后 plan_version 递增
+    plan.plan_version += 1
     attractions = plan.days[req.day_index].attractions
 
     if req.operation == "delete_attraction":

@@ -1,17 +1,19 @@
 from datetime import date
 
-from pydantic import BaseModel, field_validator, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from .enums import AccommodationType, BudgetLevel
 
 
 class TripPlanRequest(BaseModel):
-    destination: str
-    start_date: date
-    end_date: date
-    preferences: list[str]
-    budget_level: BudgetLevel
-    accommodation_type: AccommodationType
+    """行程规划请求体。"""
+
+    destination: str = Field(description="目的地名称")
+    start_date: date = Field(description="出发日期")
+    end_date: date = Field(description="返回日期")
+    preferences: list[str] = Field(description="偏好列表，如 [\"历史文化\", \"美食\"]")
+    budget_level: BudgetLevel = Field(description="预算等级：budget / moderate / luxury")
+    accommodation_type: AccommodationType = Field(description="住宿类型：hotel / hostel / apartment / resort / any")
 
     @field_validator("destination")
     @classmethod

@@ -10,10 +10,13 @@ from typing import Callable
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import RunnableConfig
 
+from trip_planner.config import get_settings
 from trip_planner.models.enums import BudgetLevel
 from trip_planner.models.plan import (
     Attraction,
+    BudgetBreakdown,
     BudgetSummary,
+    DailyForecast,
     DayPlan,
     MapPoint,
     TripPlan,
@@ -21,6 +24,8 @@ from trip_planner.models.plan import (
 )
 from trip_planner.models.request import TripPlanRequest
 from trip_planner.models.state import PlannerState
+
+_settings = get_settings()
 
 
 # ---------------------------------------------------------------------------
@@ -102,16 +107,18 @@ def _default_fetch_attractions(req: TripPlanRequest) -> list[dict]:
 
 
 def _default_fetch_weather(req: TripPlanRequest) -> dict:
+    forecasts = []
+    for i in range(req.trip_days):
+        day_date = date.fromordinal(req.start_date.toordinal() + i)
+        forecasts.append({
+            "date": str(day_date),
+            "condition": "晴" if i % 2 == 0 else "多云",
+            "high_celsius": 24,
+            "low_celsius": 16,
+        })
     return {
         "overview": f"{req.destination} 旅行期间以晴天为主，气温适宜",
-        "daily_forecasts": [
-            {
-                "date": str(req.start_date),
-                "condition": "晴",
-                "high_celsius": 24,
-                "low_celsius": 16,
-            }
-        ],
+        "daily_forecasts": forecasts,
     }
 
 
@@ -221,6 +228,7 @@ def assemble_plan(state: PlannerState) -> dict:
                 ticket_price=Decimal(a["ticket_price"])
                 if a.get("ticket_price")
                 else None,
+                image_url=a.get("image_url"),
             )
             for a in raw_attrs
         ]
@@ -238,26 +246,40 @@ def assemble_plan(state: PlannerState) -> dict:
             )
         )
 
+    # 天气汇总：daily_forecasts 转为强类型 DailyForecast
+    raw_forecasts = state.weather_data.get("daily_forecasts", [])
+    daily_forecasts = [
+        DailyForecast(
+            date=f["date"],
+            condition=f["condition"],
+            high_celsius=f["high_celsius"],
+            low_celsius=f["low_celsius"],
+        )
+        for f in raw_forecasts
+        if isinstance(f, dict)
+    ]
     weather_summary = WeatherSummary(
         overview=state.weather_data.get("overview", ""),
-        daily_forecasts=state.weather_data.get("daily_forecasts", []),
+        daily_forecasts=daily_forecasts,
     )
 
+    # 预算汇总：使用强类型 BudgetBreakdown
     budget_map = {
         BudgetLevel.BUDGET: Decimal("1000"),
         BudgetLevel.MODERATE: Decimal("3000"),
         BudgetLevel.LUXURY: Decimal("8000"),
     }
     estimated = budget_map.get(req.budget_level, Decimal("3000")) * trip_days
+    breakdown = BudgetBreakdown(
+        accommodation=estimated * Decimal("0.4"),
+        dining=estimated * Decimal("0.3"),
+        attractions=estimated * Decimal("0.2"),
+        transport=estimated * Decimal("0.1"),
+    )
     budget_summary = BudgetSummary(
         estimated_total=estimated,
-        currency="CNY",
-        breakdown={
-            "accommodation": estimated * Decimal("0.4"),
-            "dining": estimated * Decimal("0.3"),
-            "attractions": estimated * Decimal("0.2"),
-            "transport": estimated * Decimal("0.1"),
-        },
+        currency=_settings.default_currency,
+        breakdown=breakdown,
     )
 
     map_points = [
