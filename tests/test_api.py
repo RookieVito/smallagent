@@ -1,9 +1,6 @@
-"""
-FastAPI 后端 API 测试 — TDD 红阶段
-测试先于实现，运行时 trip_planner/api.py 尚不存在。
-"""
+"""FastAPI 后端 API 测试 — 覆盖 plan 端点、edit 端点和健康检查。"""
 
-from datetime import date, timedelta
+from datetime import date
 
 import pytest
 from fastapi.testclient import TestClient
@@ -50,7 +47,6 @@ class TestPlanEndpointSuccess:
 
     def test_days_count_matches_trip_duration(self, client: TestClient):
         resp = client.post("/api/trip/plan", json=_valid_payload())
-        # start=05-01, end=05-04 → 3 天
         assert len(resp.json()["days"]) == 3
 
     def test_response_has_weather_summary(self, client: TestClient):
@@ -90,6 +86,25 @@ class TestPlanEndpointSuccess:
         resp = client.post("/api/trip/plan", json=_valid_payload())
         assert resp.json()["budget_summary"]["currency"] == "CNY"
 
+    def test_budget_breakdown_is_strong_type(self, client: TestClient):
+        resp = client.post("/api/trip/plan", json=_valid_payload())
+        breakdown = resp.json()["budget_summary"]["breakdown"]
+        assert isinstance(breakdown, dict)
+        assert "accommodation" in breakdown
+        assert "dining" in breakdown
+        assert "attractions" in breakdown
+        assert "transport" in breakdown
+
+    def test_weather_daily_forecasts_are_strong_type(self, client: TestClient):
+        resp = client.post("/api/trip/plan", json=_valid_payload())
+        forecasts = resp.json()["weather_summary"]["daily_forecasts"]
+        assert isinstance(forecasts, list)
+        for f in forecasts:
+            assert "date" in f
+            assert "condition" in f
+            assert "high_celsius" in f
+            assert "low_celsius" in f
+
     def test_luxury_budget_higher_than_budget_level(self, client: TestClient):
         r_budget = client.post("/api/trip/plan", json=_valid_payload(budget_level="budget"))
         r_luxury = client.post("/api/trip/plan", json=_valid_payload(budget_level="luxury"))
@@ -101,6 +116,35 @@ class TestPlanEndpointSuccess:
     def test_content_type_is_json(self, client: TestClient):
         resp = client.post("/api/trip/plan", json=_valid_payload())
         assert "application/json" in resp.headers["content-type"]
+
+    def test_response_has_created_at(self, client: TestClient):
+        resp = client.post("/api/trip/plan", json=_valid_payload())
+        data = resp.json()
+        assert "created_at" in data
+        assert data["created_at"] is not None
+
+    def test_response_has_plan_version(self, client: TestClient):
+        resp = client.post("/api/trip/plan", json=_valid_payload())
+        data = resp.json()
+        assert "plan_version" in data
+        assert data["plan_version"] == 1
+
+    def test_response_has_cover_image_url_null(self, client: TestClient):
+        resp = client.post("/api/trip/plan", json=_valid_payload())
+        data = resp.json()
+        assert "cover_image_url" in data
+        assert data["cover_image_url"] is None
+
+    def test_attraction_has_image_url_null(self, client: TestClient):
+        resp = client.post("/api/trip/plan", json=_valid_payload())
+        for day in resp.json()["days"]:
+            for attr in day["attractions"]:
+                assert "image_url" in attr
+
+    def test_day_has_cover_image_url_null(self, client: TestClient):
+        resp = client.post("/api/trip/plan", json=_valid_payload())
+        for day in resp.json()["days"]:
+            assert "cover_image_url" in day
 
 
 # ---------------------------------------------------------------------------
@@ -161,6 +205,16 @@ class TestPlanEndpointValidation:
     def test_invalid_accommodation_type_returns_422(self, client: TestClient):
         payload = _valid_payload(accommodation_type="treehouse")
         assert client.post("/api/trip/plan", json=payload).status_code == 422
+
+    def test_422_has_structured_error_format(self, client: TestClient):
+        payload = _valid_payload(budget_level="invalid")
+        resp = client.post("/api/trip/plan", json=payload)
+        body = resp.json()
+        assert resp.status_code == 422
+        assert "error_code" in body
+        assert "message" in body
+        assert "details" in body
+        assert body["error_code"] == "VALIDATION_ERROR"
 
 
 # ---------------------------------------------------------------------------

@@ -1,0 +1,176 @@
+{
+  "destination": "东京",
+  "days": [
+    {
+      "date": "2025-11-01",
+      "attractions": [
+        {
+          "name": "东京景点A",
+          "address": "东京市中心区1号",
+          "latitude": 35.0,
+          "longitude": 135.0,
+          "suggested_duration_minutes": 90,
+          "ticket_price": "50.00",
+          "image_url": "https://images.example.com/东京景点A.jpg"
+        }
+      ],
+      "dining_suggestion": "第1天：推荐当地特色餐厅",
+      "accommodation_note": "东京精选resort",
+      "cover_image_url": "https://images.example.com/tokyo-day01.jpg"
+    },
+    {
+      "date": "2025-11-02",
+      "attractions": [
+        {
+          "name": "东京景点B",
+          "address": "东京市郊区2号",
+          "latitude": 35.01,
+          "longitude": 135.01,
+          "suggested_duration_minutes": 60,
+          "ticket_price": null,
+          "image_url": "https://images.example.com/东京景点B.jpg"
+        }
+      ],
+      "dining_suggestion": "第2天：推荐当地特色餐厅",
+      "accommodation_note": "东京精选resort",
+      "cover_image_url": "https://images.example.com/tokyo-day02.jpg"
+    },
+    {
+      "date": "2025-11-03",
+      "attractions": [
+        {
+          "name": "东京古寺",
+          "address": "东京古寺路3号",
+          "latitude": 35.02,
+          "longitude": 134.99,
+          "suggested_duration_minutes": 80,
+          "ticket_price": "30.00",
+          "image_url": "https://images.example.com/东京古寺.jpg"
+        }
+      ],
+      "dining_suggestion": "第3天：推荐当地特色餐厅",
+      "accommodation_note": "东京精选resort",
+      "cover_image_url": "https://images.example.com/tokyo-day03.jpg"
+    },
+    {
+      "date": "2025-11-04",
+      "attractions": [
+        {
+          "name": "东京市场街",
+          "address": "东京市场街4号",
+          "latitude": 34.99,
+          "longitude": 135.02,
+          "suggested_duration_minutes": 120,
+          "ticket_price": null,
+          "image_url": "https://images.example.com/东京市场街.jpg"
+        }
+      ],
+      "dining_suggestion": "第4天：推荐当地特色餐厅",
+      "accommodation_note": "东京精选resort",
+      "cover_image_url": "https://images.example.com/tokyo-day04.jpg"
+    },
+    {
+      "date": "2025-11-05",
+      "attractions": [
+        {
+          "name": "东京地标塔",
+          "address": "东京地标广场5号",
+          "latitude": 35.03,
+          "longitude": 135.03,
+          "suggested_duration_minutes": 60,
+          "ticket_price": "80.00",
+          "image_url": "https://images.example.com/东京地标塔.jpg"
+        }
+      ],
+      "dining_suggestion": "第5天：推荐当地特色餐厅",
+      "accommodation_note": "东京精选resort",
+      "cover_image_url": "https://images.example.com/tokyo-day05.jpg"
+    }
+  ],
+  "weather_summary": {
+    "overview": "东京 旅行期间以晴天为主，气温适宜",
+    "daily_forecasts": [
+      {
+        "date": "2025-11-01",
+        "condition": "晴",
+        "high_celsius": 24,
+        "low_celsius": 16
+      },
+      {
+        "date": "2025-11-02",
+        "condition": "多云",
+        "high_celsius": 24,
+        "low_celsius": 16
+      },
+      {
+        "date": "2025-11-03",
+        "condition": "晴",
+        "high_celsius": 24,
+        "low_celsius": 16
+      },
+      {
+        "date": "2025-11-04",
+        "condition": "多云",
+        "high_celsius": 24,
+        "low_celsius": 16
+      },
+      {
+        "date": "2025-11-05",
+        "condition": "晴",
+        "high_celsius": 24,
+        "low_celsius": 16
+      }
+    ]
+  },
+  "budget_summary": {
+    "estimated_total": "40000",
+    "currency": "CNY",
+    "breakdown": {
+      "accommodation": "16000.0",
+      "dining": "12000.0",
+      "attractions": "8000.0",
+      "transport": "4000.0"
+    }
+  },
+  "map_points": [
+    {
+      "name": "东京景点A",
+      "latitude": 35.0,
+      "longitude": 135.0,
+      "category": "attraction"
+    },
+    {
+      "name": "东京景点B",
+      "latitude": 35.01,
+      "longitude": 135.01,
+      "category": "attraction"
+    },
+    {
+      "name": "东京古寺",
+      "latitude": 35.02,
+      "longitude": 134.99,
+      "category": "attraction"
+    },
+    {
+      "name": "东京市场街",
+      "latitude": 34.99,
+      "longitude": 135.02,
+      "category": "attraction"
+    },
+    {
+      "name": "东京地标塔",
+      "latitude": 35.03,
+      "longitude": 135.03,
+      "category": "attraction"
+    },
+    {
+      "name": "东京花园",
+      "latitude": 34.98,
+      "longitude": 134.98,
+      "category": "attraction"
+    }
+  ],
+  "cover_image_url": "https://images.example.com/tokyo-cover.jpg",
+  "created_at": "2026-04-24T14:50:01.394698Z",
+  "plan_version": 1
+}

@@ -1,0 +1,47 @@
+{
+  "validation_error_missing_field": {
+    "error_code": "VALIDATION_ERROR",
+    "message": "请求参数验证失败",
+    "details": [
+      {
+        "loc": [
+          "body",
+          "destination"
+        ],
+        "msg": "Field required",
+        "type": "missing"
+      }
+    ]
+  },
+  "validation_error_date_range": {
+    "error_code": "VALIDATION_ERROR",
+    "message": "请求参数验证失败",
+    "details": [
+      {
+        "loc": [
+          "body"
+        ],
+        "msg": "Value error, end_date 不能早于 start_date",
+        "type": "value_error"
+      }
+    ]
+  },
+  "validation_error_index_out_of_bounds": {
+    "error_code": "VALIDATION_ERROR",
+    "message": "请求参数验证失败",
+    "details": [
+      {
+        "loc": [
+          "body"
+        ],
+        "msg": "Value error, day_index 999 越界（共 3 天）",
+        "type": "value_error"
+      }
+    ]
+  },
+  "plan_failed_503": {
+    "error_code": "PLAN_FAILED",
+    "message": "规划失败: candidate_attractions 为空",
+    "details": null
+  }
+}

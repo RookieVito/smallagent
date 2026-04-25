@@ -1,5 +1,6 @@
-import pytest
 from datetime import date
+
+import pytest
 
 from trip_planner.models import TripPlanRequest
 from trip_planner.models.enums import AccommodationType, BudgetLevel

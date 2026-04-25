@@ -1,0 +1,490 @@
+{
+  "delete_attraction": {
+    "plan": {
+      "destination": "京都",
+      "days": [
+        {
+          "date": "2025-10-15",
+          "attractions": [
+            {
+              "name": "京都景点A",
+              "address": "京都市中心区1号",
+              "latitude": 35.0,
+              "longitude": 135.0,
+              "suggested_duration_minutes": 90,
+              "ticket_price": "50.00",
+              "image_url": null
+            },
+            {
+              "name": "京都景点B",
+              "address": "京都市郊区2号",
+              "latitude": 35.01,
+              "longitude": 135.01,
+              "suggested_duration_minutes": 60,
+              "ticket_price": null,
+              "image_url": null
+            }
+          ],
+          "dining_suggestion": "第1天：推荐当地特色餐厅",
+          "accommodation_note": "京都精选hotel",
+          "cover_image_url": null
+        },
+        {
+          "date": "2025-10-16",
+          "attractions": [
+            {
+              "name": "京都古寺",
+              "address": "京都古寺路3号",
+              "latitude": 35.02,
+              "longitude": 134.99,
+              "suggested_duration_minutes": 80,
+              "ticket_price": "30.00",
+              "image_url": null
+            },
+            {
+              "name": "京都市场街",
+              "address": "京都市场街4号",
+              "latitude": 34.99,
+              "longitude": 135.02,
+              "suggested_duration_minutes": 120,
+              "ticket_price": null,
+              "image_url": null
+            }
+          ],
+          "dining_suggestion": "第2天：推荐当地特色餐厅",
+          "accommodation_note": "京都精选hotel",
+          "cover_image_url": null
+        },
+        {
+          "date": "2025-10-17",
+          "attractions": [
+            {
+              "name": "京都地标塔",
+              "address": "京都地标广场5号",
+              "latitude": 35.03,
+              "longitude": 135.03,
+              "suggested_duration_minutes": 60,
+              "ticket_price": "80.00",
+              "image_url": null
+            },
+            {
+              "name": "京都花园",
+              "address": "京都花园路6号",
+              "latitude": 34.98,
+              "longitude": 134.98,
+              "suggested_duration_minutes": 90,
+              "ticket_price": null,
+              "image_url": null
+            }
+          ],
+          "dining_suggestion": "第3天：推荐当地特色餐厅",
+          "accommodation_note": "京都精选hotel",
+          "cover_image_url": null
+        }
+      ],
+      "weather_summary": {
+        "overview": "京都 旅行期间以晴天为主，气温适宜",
+        "daily_forecasts": [
+          {
+            "date": "2025-10-15",
+            "condition": "晴",
+            "high_celsius": 24,
+            "low_celsius": 16
+          },
+          {
+            "date": "2025-10-16",
+            "condition": "多云",
+            "high_celsius": 24,
+            "low_celsius": 16
+          },
+          {
+            "date": "2025-10-17",
+            "condition": "晴",
+            "high_celsius": 24,
+            "low_celsius": 16
+          }
+        ]
+      },
+      "budget_summary": {
+        "estimated_total": "9000",
+        "currency": "CNY",
+        "breakdown": {
+          "accommodation": "3600.0",
+          "dining": "2700.0",
+          "attractions": "1800.0",
+          "transport": "900.0"
+        }
+      },
+      "map_points": [
+        {
+          "name": "京都景点A",
+          "latitude": 35.0,
+          "longitude": 135.0,
+          "category": "attraction"
+        },
+        {
+          "name": "京都景点B",
+          "latitude": 35.01,
+          "longitude": 135.01,
+          "category": "attraction"
+        },
+        {
+          "name": "京都古寺",
+          "latitude": 35.02,
+          "longitude": 134.99,
+          "category": "attraction"
+        },
+        {
+          "name": "京都市场街",
+          "latitude": 34.99,
+          "longitude": 135.02,
+          "category": "attraction"
+        },
+        {
+          "name": "京都地标塔",
+          "latitude": 35.03,
+          "longitude": 135.03,
+          "category": "attraction"
+        },
+        {
+          "name": "京都花园",
+          "latitude": 34.98,
+          "longitude": 134.98,
+          "category": "attraction"
+        }
+      ],
+      "cover_image_url": null,
+      "created_at": "2026-04-24T14:50:01.388931Z",
+      "plan_version": 1
+    },
+    "operation": "delete_attraction",
+    "day_index": 0,
+    "attraction_index": 0
+  },
+  "move_attraction_up": {
+    "plan": {
+      "destination": "京都",
+      "days": [
+        {
+          "date": "2025-10-15",
+          "attractions": [
+            {
+              "name": "京都景点A",
+              "address": "京都市中心区1号",
+              "latitude": 35.0,
+              "longitude": 135.0,
+              "suggested_duration_minutes": 90,
+              "ticket_price": "50.00",
+              "image_url": null
+            },
+            {
+              "name": "京都景点B",
+              "address": "京都市郊区2号",
+              "latitude": 35.01,
+              "longitude": 135.01,
+              "suggested_duration_minutes": 60,
+              "ticket_price": null,
+              "image_url": null
+            }
+          ],
+          "dining_suggestion": "第1天：推荐当地特色餐厅",
+          "accommodation_note": "京都精选hotel",
+          "cover_image_url": null
+        },
+        {
+          "date": "2025-10-16",
+          "attractions": [
+            {
+              "name": "京都古寺",
+              "address": "京都古寺路3号",
+              "latitude": 35.02,
+              "longitude": 134.99,
+              "suggested_duration_minutes": 80,
+              "ticket_price": "30.00",
+              "image_url": null
+            },
+            {
+              "name": "京都市场街",
+              "address": "京都市场街4号",
+              "latitude": 34.99,
+              "longitude": 135.02,
+              "suggested_duration_minutes": 120,
+              "ticket_price": null,
+              "image_url": null
+            }
+          ],
+          "dining_suggestion": "第2天：推荐当地特色餐厅",
+          "accommodation_note": "京都精选hotel",
+          "cover_image_url": null
+        },
+        {
+          "date": "2025-10-17",
+          "attractions": [
+            {
+              "name": "京都地标塔",
+              "address": "京都地标广场5号",
+              "latitude": 35.03,
+              "longitude": 135.03,
+              "suggested_duration_minutes": 60,
+              "ticket_price": "80.00",
+              "image_url": null
+            },
+            {
+              "name": "京都花园",
+              "address": "京都花园路6号",
+              "latitude": 34.98,
+              "longitude": 134.98,
+              "suggested_duration_minutes": 90,
+              "ticket_price": null,
+              "image_url": null
+            }
+          ],
+          "dining_suggestion": "第3天：推荐当地特色餐厅",
+          "accommodation_note": "京都精选hotel",
+          "cover_image_url": null
+        }
+      ],
+      "weather_summary": {
+        "overview": "京都 旅行期间以晴天为主，气温适宜",
+        "daily_forecasts": [
+          {
+            "date": "2025-10-15",
+            "condition": "晴",
+            "high_celsius": 24,
+            "low_celsius": 16
+          },
+          {
+            "date": "2025-10-16",
+            "condition": "多云",
+            "high_celsius": 24,
+            "low_celsius": 16
+          },
+          {
+            "date": "2025-10-17",
+            "condition": "晴",
+            "high_celsius": 24,
+            "low_celsius": 16
+          }
+        ]
+      },
+      "budget_summary": {
+        "estimated_total": "9000",
+        "currency": "CNY",
+        "breakdown": {
+          "accommodation": "3600.0",
+          "dining": "2700.0",
+          "attractions": "1800.0",
+          "transport": "900.0"
+        }
+      },
+      "map_points": [
+        {
+          "name": "京都景点A",
+          "latitude": 35.0,
+          "longitude": 135.0,
+          "category": "attraction"
+        },
+        {
+          "name": "京都景点B",
+          "latitude": 35.01,
+          "longitude": 135.01,
+          "category": "attraction"
+        },
+        {
+          "name": "京都古寺",
+          "latitude": 35.02,
+          "longitude": 134.99,
+          "category": "attraction"
+        },
+        {
+          "name": "京都市场街",
+          "latitude": 34.99,
+          "longitude": 135.02,
+          "category": "attraction"
+        },
+        {
+          "name": "京都地标塔",
+          "latitude": 35.03,
+          "longitude": 135.03,
+          "category": "attraction"
+        },
+        {
+          "name": "京都花园",
+          "latitude": 34.98,
+          "longitude": 134.98,
+          "category": "attraction"
+        }
+      ],
+      "cover_image_url": null,
+      "created_at": "2026-04-24T14:50:01.388931Z",
+      "plan_version": 1
+    },
+    "operation": "move_attraction",
+    "day_index": 0,
+    "attraction_index": 1,
+    "direction": "up"
+  },
+  "move_attraction_down": {
+    "plan": {
+      "destination": "京都",
+      "days": [
+        {
+          "date": "2025-10-15",
+          "attractions": [
+            {
+              "name": "京都景点A",
+              "address": "京都市中心区1号",
+              "latitude": 35.0,
+              "longitude": 135.0,
+              "suggested_duration_minutes": 90,
+              "ticket_price": "50.00",
+              "image_url": null
+            },
+            {
+              "name": "京都景点B",
+              "address": "京都市郊区2号",
+              "latitude": 35.01,
+              "longitude": 135.01,
+              "suggested_duration_minutes": 60,
+              "ticket_price": null,
+              "image_url": null
+            }
+          ],
+          "dining_suggestion": "第1天：推荐当地特色餐厅",
+          "accommodation_note": "京都精选hotel",
+          "cover_image_url": null
+        },
+        {
+          "date": "2025-10-16",
+          "attractions": [
+            {
+              "name": "京都古寺",
+              "address": "京都古寺路3号",
+              "latitude": 35.02,
+              "longitude": 134.99,
+              "suggested_duration_minutes": 80,
+              "ticket_price": "30.00",
+              "image_url": null
+            },
+            {
+              "name": "京都市场街",
+              "address": "京都市场街4号",
+              "latitude": 34.99,
+              "longitude": 135.02,
+              "suggested_duration_minutes": 120,
+              "ticket_price": null,
+              "image_url": null
+            }
+          ],
+          "dining_suggestion": "第2天：推荐当地特色餐厅",
+          "accommodation_note": "京都精选hotel",
+          "cover_image_url": null
+        },
+        {
+          "date": "2025-10-17",
+          "attractions": [
+            {
+              "name": "京都地标塔",
+              "address": "京都地标广场5号",
+              "latitude": 35.03,
+              "longitude": 135.03,
+              "suggested_duration_minutes": 60,
+              "ticket_price": "80.00",
+              "image_url": null
+            },
+            {
+              "name": "京都花园",
+              "address": "京都花园路6号",
+              "latitude": 34.98,
+              "longitude": 134.98,
+              "suggested_duration_minutes": 90,
+              "ticket_price": null,
+              "image_url": null
+            }
+          ],
+          "dining_suggestion": "第3天：推荐当地特色餐厅",
+          "accommodation_note": "京都精选hotel",
+          "cover_image_url": null
+        }
+      ],
+      "weather_summary": {
+        "overview": "京都 旅行期间以晴天为主，气温适宜",
+        "daily_forecasts": [
+          {
+            "date": "2025-10-15",
+            "condition": "晴",
+            "high_celsius": 24,
+            "low_celsius": 16
+          },
+          {
+            "date": "2025-10-16",
+            "condition": "多云",
+            "high_celsius": 24,
+            "low_celsius": 16
+          },
+          {
+            "date": "2025-10-17",
+            "condition": "晴",
+            "high_celsius": 24,
+            "low_celsius": 16
+          }
+        ]
+      },
+      "budget_summary": {
+        "estimated_total": "9000",
+        "currency": "CNY",
+        "breakdown": {
+          "accommodation": "3600.0",
+          "dining": "2700.0",
+          "attractions": "1800.0",
+          "transport": "900.0"
+        }
+      },
+      "map_points": [
+        {
+          "name": "京都景点A",
+          "latitude": 35.0,
+          "longitude": 135.0,
+          "category": "attraction"
+        },
+        {
+          "name": "京都景点B",
+          "latitude": 35.01,
+          "longitude": 135.01,
+          "category": "attraction"
+        },
+        {
+          "name": "京都古寺",
+          "latitude": 35.02,
+          "longitude": 134.99,
+          "category": "attraction"
+        },
+        {
+          "name": "京都市场街",
+          "latitude": 34.99,
+          "longitude": 135.02,
+          "category": "attraction"
+        },
+        {
+          "name": "京都地标塔",
+          "latitude": 35.03,
+          "longitude": 135.03,
+          "category": "attraction"
+        },
+        {
+          "name": "京都花园",
+          "latitude": 34.98,
+          "longitude": 134.98,
+          "category": "attraction"
+        }
+      ],
+      "cover_image_url": null,
+      "created_at": "2026-04-24T14:50:01.388931Z",
+      "plan_version": 1
+    },
+    "operation": "move_attraction",
+    "day_index": 0,
+    "attraction_index": 0,
+    "direction": "down"
+  }
+}
