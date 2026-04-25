@@ -1,11 +1,13 @@
-"""阶段四测试 — 验证 contract 文档的完整性。"""
+"""阶段四测试 — 验证 contract 文档与交付边界的完整性。"""
 
 import json
 import os
+import subprocess
 
 import pytest
 
 DOCS_DIR = os.path.join(os.path.dirname(__file__), "..", "docs", "RookieVito")
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 
 
 class TestFieldStabilityDocument:
@@ -107,3 +109,29 @@ class TestDeliveryPlanUpdated:
         assert "阶段二：OpenAPI/Swagger 完善 ✅" in content
         assert "阶段三：示例 JSON 交付物 ✅" in content
         assert "阶段四：Contract 文档与通知机制 ✅" in content
+
+
+class TestRepoHygiene:
+    def test_requirements_declare_pydantic_settings(self):
+        path = os.path.join(REPO_ROOT, "requirements.txt")
+        content = open(path, encoding="utf-8").read()
+        assert "pydantic-settings" in content
+
+    def test_gitignore_ignores_env(self):
+        path = os.path.join(REPO_ROOT, ".gitignore")
+        content = open(path, encoding="utf-8").read()
+        assert "\n.env\n" in f"\n{content}\n"
+
+    def test_env_example_exists(self):
+        path = os.path.join(REPO_ROOT, ".env.example")
+        assert os.path.isfile(path)
+
+    def test_env_is_not_tracked(self):
+        result = subprocess.run(
+            ["git", "ls-files", "--error-unmatch", ".env"],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert result.returncode != 0
