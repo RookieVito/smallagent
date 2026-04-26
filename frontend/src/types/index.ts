@@ -77,5 +77,5 @@ export interface EditRequest {
   operation: 'delete_attraction' | 'move_attraction'
   day_index: number
   attraction_index: number
-  direction?: 'up' | 'down'
+  direction?: 'up' | 'down' | null
 }
