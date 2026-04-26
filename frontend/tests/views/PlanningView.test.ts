@@ -101,6 +101,7 @@ describe('PlanningView', () => {
     // Wait for async
     await vi.waitFor(() => {
       expect(api.createTripPlan).toHaveBeenCalled()
+      expect(wrapper.text()).toContain('行程规划失败')
     }, { timeout: 2000 })
   })
 })

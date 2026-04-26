@@ -36,6 +36,7 @@ No contract gaps were found during step 3 implementation. The frozen contract wa
 - `cover_image_url` (TripPlan, DayPlan levels) — may be renamed to `hero_image_url`
 - `image_url` (Attraction level) — null until image backfill
 - DayPlan `cover_image_url` — may change from single value to list
+- `MapPoint.category` — stable but currently rendered uniformly; B may introduce distinct categories (restaurant, hotel) in step 4
 
 Frontend handles all these as nullable with conditional rendering. No hard dependency on their values.
 
