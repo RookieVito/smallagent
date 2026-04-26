@@ -20,17 +20,14 @@ const dateRange = computed(() => {
 
 const dayCount = computed(() => plan.value?.days.length ?? 0)
 
-const visibleMapPoints = computed(() => {
-  if (!plan.value) return []
-  return plan.value.days.flatMap(day =>
-    day.attractions.map(a => ({
-      name: a.name,
-      latitude: a.latitude,
-      longitude: a.longitude,
-      category: 'attraction',
-    })),
-  )
-})
+const visibleMapPoints = computed(() => plan.value?.map_points ?? [])
+
+const forecastColumns = [
+  { title: '日期', dataIndex: 'date', key: 'date' },
+  { title: '天气', dataIndex: 'condition', key: 'condition' },
+  { title: '最高温', dataIndex: 'high_celsius', key: 'high_celsius', customRender: ({ text }: { text: number }) => `${text}°C` },
+  { title: '最低温', dataIndex: 'low_celsius', key: 'low_celsius', customRender: ({ text }: { text: number }) => `${text}°C` },
+]
 
 function goBack() {
   router.push({ name: 'planning' })
@@ -157,11 +154,12 @@ async function moveAttraction(dayIndex: number, attractionIndex: number, directi
         <!-- Budget section -->
         <div id="section-budget" style="margin-bottom: 24px">
           <a-card title="预算摘要">
-            <a-statistic title="预估总费用" :value="plan.budget_summary.estimated_total" :prefix="'¥'" />
-            <a-descriptions v-if="Object.keys(plan.budget_summary.breakdown).length" :column="1" size="small" style="margin-top: 12px">
-              <a-descriptions-item v-for="(amount, label) in plan.budget_summary.breakdown" :key="label" :label="String(label)">
-                ¥{{ amount }}
-              </a-descriptions-item>
+            <a-statistic title="预估总费用" :value="Number(plan.budget_summary.estimated_total)" prefix="¥" />
+            <a-descriptions :column="1" size="small" style="margin-top: 12px">
+              <a-descriptions-item label="住宿">¥{{ plan.budget_summary.breakdown.accommodation }}</a-descriptions-item>
+              <a-descriptions-item label="餐饮">¥{{ plan.budget_summary.breakdown.dining }}</a-descriptions-item>
+              <a-descriptions-item label="景点">¥{{ plan.budget_summary.breakdown.attractions }}</a-descriptions-item>
+              <a-descriptions-item label="交通">¥{{ plan.budget_summary.breakdown.transport }}</a-descriptions-item>
             </a-descriptions>
           </a-card>
         </div>
@@ -207,6 +205,15 @@ async function moveAttraction(dayIndex: number, attractionIndex: number, directi
         <div id="section-weather" style="margin-bottom: 24px">
           <a-card title="天气概况">
             <p>{{ plan.weather_summary.overview }}</p>
+            <a-table
+              v-if="plan.weather_summary.daily_forecasts?.length"
+              :data-source="plan.weather_summary.daily_forecasts"
+              :columns="forecastColumns"
+              :pagination="false"
+              size="small"
+              style="margin-top: 12px"
+              row-key="date"
+            />
           </a-card>
         </div>
       </a-col>
