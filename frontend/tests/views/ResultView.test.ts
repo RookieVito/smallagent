@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createRouter, createMemoryHistory } from 'vue-router'
 import Antd from 'ant-design-vue'
+import MapContainer from '@/components/MapContainer.vue'
 import ResultView from '@/views/ResultView.vue'
 import { usePlanStore } from '@/composables/usePlanStore'
 import { editTripPlan } from '@/services/api'
@@ -123,8 +124,6 @@ function mountResult(plan: TripPlan | null = mockPlan) {
 describe('ResultView', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    const { clearPlan } = usePlanStore()
-    clearPlan()
   })
 
   it('renders destination in overview', () => {
@@ -356,8 +355,7 @@ describe('ResultView', () => {
 
     it('passes backend map_points to MapContainer', () => {
       const wrapper = mountResult()
-      const vm = wrapper.vm as any
-      expect(vm.visibleMapPoints).toEqual(mockPlan.map_points)
+      expect(wrapper.getComponent(MapContainer).props('mapPoints')).toEqual(mockPlan.map_points)
     })
 
     it('does not show editing progress alert in idle state', async () => {

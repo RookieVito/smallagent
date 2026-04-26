@@ -57,10 +57,9 @@ describe('PlanningView', () => {
   })
 
   it('calls createTripPlan on valid submission', async () => {
-    const router = createTestRouter()
     vi.mocked(api.createTripPlan).mockResolvedValueOnce(mockPlan as any)
 
-    const wrapper = mountPlanning(router)
+    const wrapper = mountPlanning()
 
     // Fill destination
     const input = wrapper.find('input')

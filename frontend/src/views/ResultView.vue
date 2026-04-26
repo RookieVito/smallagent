@@ -8,7 +8,7 @@ import MapContainer from '@/components/MapContainer.vue'
 
 const router = useRouter()
 const { currentPlan, setPlan } = usePlanStore()
-const plan = computed(() => currentPlan.value)
+const plan = currentPlan
 const editing = ref(false)
 const lastEditError = ref<string | null>(null)
 
@@ -19,8 +19,6 @@ const dateRange = computed(() => {
 })
 
 const dayCount = computed(() => plan.value?.days.length ?? 0)
-
-const visibleMapPoints = computed(() => plan.value?.map_points ?? [])
 
 const forecastColumns = [
   { title: '日期', dataIndex: 'date', key: 'date' },
@@ -167,7 +165,7 @@ async function moveAttraction(dayIndex: number, attractionIndex: number, directi
         <!-- Map section -->
         <div id="section-map" style="margin-bottom: 24px">
           <a-card title="地图">
-            <MapContainer :map-points="visibleMapPoints" />
+            <MapContainer :map-points="plan.map_points" />
           </a-card>
         </div>
 

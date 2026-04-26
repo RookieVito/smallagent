@@ -2,7 +2,7 @@
 
 ## Completion Status
 
-Step 3 frontend delivery is complete. All frontend-owned scope has been implemented and tested against the frozen contract in `docs/RookieVito/`.
+Step 3 frontend delivery is complete: all frontend-owned scope is implemented and tested against the frozen contract in `docs/RookieVito/`.
 
 ## What A Delivered
 
