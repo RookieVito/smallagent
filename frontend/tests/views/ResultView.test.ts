@@ -360,7 +360,7 @@ describe('ResultView', () => {
       expect(vm.visibleMapPoints).toEqual(mockPlan.map_points)
     })
 
-    it('shows editing progress alert when editing', async () => {
+    it('does not show editing progress alert in idle state', async () => {
       const wrapper = mountResult()
       expect(wrapper.text()).not.toContain('正在更新行程')
     })
