@@ -158,11 +158,6 @@ describe('ResultView', () => {
     expect(wrapper.text()).toContain('900')
   })
 
-  it('renders budget notes', () => {
-    const wrapper = mountResult()
-    expect(wrapper.text()).toContain('预估费用')
-  })
-
   it('renders map error state when AMap key is not configured', async () => {
     const wrapper = mountResult()
     // initMap is async (onMounted), wait for it to complete

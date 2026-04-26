@@ -163,7 +163,6 @@ async function moveAttraction(dayIndex: number, attractionIndex: number, directi
                 ¥{{ amount }}
               </a-descriptions-item>
             </a-descriptions>
-            <p v-if="plan.budget_summary.notes" style="margin-top: 8px; color: #888">{{ plan.budget_summary.notes }}</p>
           </a-card>
         </div>
 
