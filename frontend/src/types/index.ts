@@ -17,7 +17,8 @@ export interface Attraction {
   latitude: number
   longitude: number
   suggested_duration_minutes: number
-  ticket_price: number | null
+  ticket_price: string | null
+  image_url: string | null
 }
 
 export interface DayPlan {
@@ -25,25 +26,39 @@ export interface DayPlan {
   attractions: Attraction[]
   dining_suggestion: string
   accommodation_note: string
+  cover_image_url: string | null
 }
 
 export interface MapPoint {
   name: string
   latitude: number
   longitude: number
-  category: string
+  category?: string
+}
+
+export interface BudgetBreakdown {
+  accommodation: string
+  dining: string
+  attractions: string
+  transport: string
 }
 
 export interface BudgetSummary {
-  estimated_total: number
+  estimated_total: string
   currency: string
-  breakdown: Record<string, number>
-  notes: string
+  breakdown: BudgetBreakdown
+}
+
+export interface DailyForecast {
+  date: string
+  condition: string
+  high_celsius: number
+  low_celsius: number
 }
 
 export interface WeatherSummary {
   overview: string
-  daily_forecasts: Record<string, unknown>[]
+  daily_forecasts: DailyForecast[]
 }
 
 export interface TripPlan {
@@ -52,6 +67,9 @@ export interface TripPlan {
   weather_summary: WeatherSummary
   budget_summary: BudgetSummary
   map_points: MapPoint[]
+  cover_image_url: string | null
+  created_at: string | null
+  plan_version: number
 }
 
 export interface EditRequest {
