@@ -24,21 +24,25 @@ const mockPlan: TripPlan = {
           latitude: 39.9163,
           longitude: 116.3972,
           suggested_duration_minutes: 180,
-          ticket_price: 60,
+          ticket_price: '60',
+          image_url: null,
         },
       ],
       dining_suggestion: '王府井小吃街',
       accommodation_note: '王府井附近酒店',
+      cover_image_url: null,
     },
   ],
   weather_summary: { overview: '晴朗宜人', daily_forecasts: [] },
   budget_summary: {
-    estimated_total: 3000,
+    estimated_total: '3000',
     currency: 'CNY',
-    breakdown: { '住宿': 1200, '餐饮': 900 },
-    notes: '预估费用',
+    breakdown: { accommodation: '1200', dining: '900', attractions: '500', transport: '400' },
   },
   map_points: [{ name: '故宫', latitude: 39.9163, longitude: 116.3972, category: 'attraction' }],
+  cover_image_url: null,
+  created_at: null,
+  plan_version: 1,
 }
 
 const mockPlanMultiAttractions: TripPlan = {
@@ -53,7 +57,8 @@ const mockPlanMultiAttractions: TripPlan = {
           latitude: 39.9163,
           longitude: 116.3972,
           suggested_duration_minutes: 180,
-          ticket_price: 60,
+          ticket_price: '60',
+          image_url: null,
         },
         {
           name: '天坛',
@@ -61,7 +66,8 @@ const mockPlanMultiAttractions: TripPlan = {
           latitude: 39.8822,
           longitude: 116.4066,
           suggested_duration_minutes: 120,
-          ticket_price: 15,
+          ticket_price: '15',
+          image_url: null,
         },
         {
           name: '颐和园',
@@ -69,25 +75,29 @@ const mockPlanMultiAttractions: TripPlan = {
           latitude: 39.9998,
           longitude: 116.2755,
           suggested_duration_minutes: 150,
-          ticket_price: 30,
+          ticket_price: '30',
+          image_url: null,
         },
       ],
       dining_suggestion: '王府井小吃街',
       accommodation_note: '王府井附近酒店',
+      cover_image_url: null,
     },
   ],
   weather_summary: { overview: '晴朗宜人', daily_forecasts: [] },
   budget_summary: {
-    estimated_total: 3000,
+    estimated_total: '3000',
     currency: 'CNY',
-    breakdown: { '住宿': 1200, '餐饮': 900 },
-    notes: '预估费用',
+    breakdown: { accommodation: '1200', dining: '900', attractions: '500', transport: '400' },
   },
   map_points: [
     { name: '故宫', latitude: 39.9163, longitude: 116.3972, category: 'attraction' },
     { name: '天坛', latitude: 39.8822, longitude: 116.4066, category: 'attraction' },
     { name: '颐和园', latitude: 39.9998, longitude: 116.2755, category: 'attraction' },
   ],
+  cover_image_url: null,
+  created_at: null,
+  plan_version: 1,
 }
 
 function mountResult(plan: TripPlan | null = mockPlan) {
@@ -149,6 +159,8 @@ describe('ResultView', () => {
     const wrapper = mountResult()
     expect(wrapper.text()).toContain('住宿')
     expect(wrapper.text()).toContain('餐饮')
+    expect(wrapper.text()).toContain('景点')
+    expect(wrapper.text()).toContain('交通')
   })
 
   it('renders budget breakdown values', () => {
@@ -156,6 +168,8 @@ describe('ResultView', () => {
     // a-descriptions renders values without locale formatting
     expect(wrapper.text()).toContain('1200')
     expect(wrapper.text()).toContain('900')
+    expect(wrapper.text()).toContain('500')
+    expect(wrapper.text()).toContain('400')
   })
 
   it('renders map error state when AMap key is not configured', async () => {
@@ -311,6 +325,70 @@ describe('ResultView', () => {
         attraction_index: 0,
         direction: 'down',
       })
+    })
+
+    it('shows error alert on delete failure', async () => {
+      vi.mocked(editTripPlan).mockRejectedValueOnce(new Error('fail'))
+      const wrapper = await mountAndExpand(mockPlanMultiAttractions)
+      const deleteButtons = wrapper.findAll('button[title="删除"]')
+      await deleteButtons[0].trigger('click')
+      await vi.waitFor(() => {
+        expect(wrapper.text()).toContain('删除失败')
+      })
+    })
+  })
+
+  describe('step 3 features', () => {
+    it('renders all five result sections', () => {
+      const wrapper = mountResult()
+      expect(wrapper.find('#section-overview').exists()).toBe(true)
+      expect(wrapper.find('#section-budget').exists()).toBe(true)
+      expect(wrapper.find('#section-map').exists()).toBe(true)
+      expect(wrapper.find('#section-days').exists()).toBe(true)
+      expect(wrapper.find('#section-weather').exists()).toBe(true)
+    })
+
+    it('renders side navigation with all section links', () => {
+      const wrapper = mountResult()
+      const anchorLinks = wrapper.findAll('.ant-anchor-link')
+      expect(anchorLinks.length).toBe(5)
+    })
+
+    it('passes backend map_points to MapContainer', () => {
+      const wrapper = mountResult()
+      const vm = wrapper.vm as any
+      expect(vm.visibleMapPoints).toEqual(mockPlan.map_points)
+    })
+
+    it('shows editing progress alert when editing', async () => {
+      const wrapper = mountResult()
+      expect(wrapper.text()).not.toContain('正在更新行程')
+    })
+
+    it('renders daily forecasts table when available', () => {
+      const planWithForecasts: TripPlan = {
+        ...mockPlan,
+        weather_summary: {
+          overview: '晴朗宜人',
+          daily_forecasts: [
+            { date: '2026-05-01', condition: '晴', high_celsius: 28, low_celsius: 15 },
+          ],
+        },
+      }
+      const wrapper = mountResult(planWithForecasts)
+      expect(wrapper.text()).toContain('28°C')
+      expect(wrapper.text()).toContain('15°C')
+    })
+
+    it('renders plan version in overview', () => {
+      const wrapper = mountResult()
+      expect(wrapper.text()).toContain('v1')
+    })
+
+    it('renders export button with tooltip', () => {
+      const wrapper = mountResult()
+      expect(wrapper.text()).toContain('导')
+      expect(wrapper.text()).toContain('出')
     })
   })
 })

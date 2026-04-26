@@ -10,10 +10,13 @@ vi.mock('@/services/api')
 
 const mockPlan = {
   destination: '北京',
-  days: [{ date: '2026-05-01', attractions: [], dining_suggestion: '', accommodation_note: '' }],
+  days: [{ date: '2026-05-01', attractions: [], dining_suggestion: '', accommodation_note: '', cover_image_url: null }],
   weather_summary: { overview: '晴', daily_forecasts: [] },
-  budget_summary: { estimated_total: 1000, currency: 'CNY', breakdown: {}, notes: '' },
+  budget_summary: { estimated_total: '1000', currency: 'CNY', breakdown: { accommodation: '400', dining: '300', attractions: '200', transport: '100' } },
   map_points: [],
+  cover_image_url: null,
+  created_at: null,
+  plan_version: 1,
 }
 
 function createTestRouter() {

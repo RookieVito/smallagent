@@ -32,16 +32,21 @@ const mockTripPlan: TripPlan = {
           latitude: 39.9163,
           longitude: 116.3972,
           suggested_duration_minutes: 180,
-          ticket_price: 60,
+          ticket_price: '60',
+          image_url: null,
         },
       ],
       dining_suggestion: '王府井小吃街',
       accommodation_note: '推荐住在王府井附近',
+      cover_image_url: null,
     },
   ],
   weather_summary: { overview: '晴朗', daily_forecasts: [] },
-  budget_summary: { estimated_total: 3000, currency: 'CNY', breakdown: {}, notes: '' },
+  budget_summary: { estimated_total: '3000', currency: 'CNY', breakdown: { accommodation: '1200', dining: '900', attractions: '500', transport: '400' } },
   map_points: [{ name: '故宫', latitude: 39.9163, longitude: 116.3972, category: 'attraction' }],
+  cover_image_url: null,
+  created_at: null,
+  plan_version: 1,
 }
 
 beforeEach(() => {
