@@ -9,6 +9,7 @@ import type { BudgetLevel, AccommodationType } from '@/types'
 const router = useRouter()
 const { setPlan } = usePlanStore()
 const loading = ref(false)
+const lastError = ref<string | null>(null)
 
 const form = reactive({
   destination: '',
@@ -32,6 +33,10 @@ const accommodationOptions: { value: AccommodationType; label: string }[] = [
   { value: 'any', label: '不限' },
 ]
 
+function dismissError() {
+  lastError.value = null
+}
+
 async function handleSubmit() {
   if (!form.destination.trim()) {
     message.warning('请输入目的地')
@@ -47,6 +52,7 @@ async function handleSubmit() {
   }
 
   loading.value = true
+  lastError.value = null
   try {
     const plan = await createTripPlan({
       destination: form.destination.trim(),
@@ -59,6 +65,7 @@ async function handleSubmit() {
     setPlan(plan)
     router.push({ name: 'result' })
   } catch {
+    lastError.value = '行程规划失败，请稍后重试'
     message.error('行程规划失败，请稍后重试')
   } finally {
     loading.value = false
@@ -68,50 +75,64 @@ async function handleSubmit() {
 
 <template>
   <a-card title="智能旅行助手" style="max-width: 600px; margin: 0 auto">
-    <a-form layout="vertical" @submit.prevent="handleSubmit">
-      <a-form-item label="目的地" required>
-        <a-input v-model:value="form.destination" placeholder="请输入目的地" />
-      </a-form-item>
+    <!-- Page-level error alert -->
+    <a-alert
+      v-if="lastError"
+      type="error"
+      :message="lastError"
+      show-icon
+      closable
+      style="margin-bottom: 16px"
+      @close="dismissError"
+    />
 
-      <a-form-item label="出行日期" required>
-        <a-range-picker
-          v-model:value="form.dateRange"
-          style="width: 100%"
-          format="YYYY-MM-DD"
-          value-format="YYYY-MM-DD"
-        />
-      </a-form-item>
+    <!-- Loading overlay -->
+    <a-spin :spinning="loading" tip="正在生成行程...">
+      <a-form layout="vertical" @submit.prevent="handleSubmit">
+        <a-form-item label="目的地" required>
+          <a-input v-model:value="form.destination" placeholder="请输入目的地" />
+        </a-form-item>
 
-      <a-form-item label="旅行偏好" required>
-        <a-select
-          v-model:value="form.preferences"
-          mode="tags"
-          placeholder="输入偏好后按回车添加"
-          :token-separators="[',']"
-        />
-      </a-form-item>
+        <a-form-item label="出行日期" required>
+          <a-range-picker
+            v-model:value="form.dateRange"
+            style="width: 100%"
+            format="YYYY-MM-DD"
+            value-format="YYYY-MM-DD"
+          />
+        </a-form-item>
 
-      <a-form-item label="预算等级">
-        <a-select v-model:value="form.budget_level">
-          <a-select-option v-for="opt in budgetOptions" :key="opt.value" :value="opt.value">
-            {{ opt.label }}
-          </a-select-option>
-        </a-select>
-      </a-form-item>
+        <a-form-item label="旅行偏好" required>
+          <a-select
+            v-model:value="form.preferences"
+            mode="tags"
+            placeholder="输入偏好后按回车添加"
+            :token-separators="[',']"
+          />
+        </a-form-item>
 
-      <a-form-item label="住宿类型">
-        <a-select v-model:value="form.accommodation_type">
-          <a-select-option v-for="opt in accommodationOptions" :key="opt.value" :value="opt.value">
-            {{ opt.label }}
-          </a-select-option>
-        </a-select>
-      </a-form-item>
+        <a-form-item label="预算等级">
+          <a-select v-model:value="form.budget_level">
+            <a-select-option v-for="opt in budgetOptions" :key="opt.value" :value="opt.value">
+              {{ opt.label }}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
 
-      <a-form-item>
-        <a-button type="primary" html-type="submit" :loading="loading" block>
-          生成行程
-        </a-button>
-      </a-form-item>
-    </a-form>
+        <a-form-item label="住宿类型">
+          <a-select v-model:value="form.accommodation_type">
+            <a-select-option v-for="opt in accommodationOptions" :key="opt.value" :value="opt.value">
+              {{ opt.label }}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+
+        <a-form-item>
+          <a-button type="primary" html-type="submit" :loading="loading" block>
+            生成行程
+          </a-button>
+        </a-form-item>
+      </a-form>
+    </a-spin>
   </a-card>
 </template>

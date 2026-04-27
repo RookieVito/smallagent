@@ -10,10 +10,13 @@ vi.mock('@/services/api')
 
 const mockPlan = {
   destination: '北京',
-  days: [{ date: '2026-05-01', attractions: [], dining_suggestion: '', accommodation_note: '' }],
+  days: [{ date: '2026-05-01', attractions: [], dining_suggestion: '', accommodation_note: '', cover_image_url: null }],
   weather_summary: { overview: '晴', daily_forecasts: [] },
-  budget_summary: { estimated_total: 1000, currency: 'CNY', breakdown: {}, notes: '' },
+  budget_summary: { estimated_total: '1000', currency: 'CNY', breakdown: { accommodation: '400', dining: '300', attractions: '200', transport: '100' } },
   map_points: [],
+  cover_image_url: null,
+  created_at: null,
+  plan_version: 1,
 }
 
 function createTestRouter() {
@@ -54,10 +57,9 @@ describe('PlanningView', () => {
   })
 
   it('calls createTripPlan on valid submission', async () => {
-    const router = createTestRouter()
     vi.mocked(api.createTripPlan).mockResolvedValueOnce(mockPlan as any)
 
-    const wrapper = mountPlanning(router)
+    const wrapper = mountPlanning()
 
     // Fill destination
     const input = wrapper.find('input')
@@ -98,6 +100,7 @@ describe('PlanningView', () => {
     // Wait for async
     await vi.waitFor(() => {
       expect(api.createTripPlan).toHaveBeenCalled()
+      expect(wrapper.text()).toContain('行程规划失败')
     }, { timeout: 2000 })
   })
 })

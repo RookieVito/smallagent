@@ -2,6 +2,7 @@
 __pycache__/
 模版/
 .venv/
+.env
 阶段/
 node_modules/
 frontend/dist/
